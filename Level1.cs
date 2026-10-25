@@ -31,10 +31,18 @@ namespace A_BUS_FOR_THE_MOON
         // Game States
 
         public LevelState CurrentLevelState { get; set; } = LevelState.Level1;
+
+        public bool Winner = false;
+        public bool Looser = false;
+
+        public float EndTimer;
+
         //THE MOON ARRIVAL
         public Texture2D MyMoon;
         public Vector2 MoonPosition;
         float MoonSpeed;
+        public float SpeedEntreeLune;
+        public bool MoonArrived = false;
 
 
 
@@ -43,6 +51,7 @@ namespace A_BUS_FOR_THE_MOON
         public Texture2D MyBorder2;
         public Texture2D MyBorder3;
         public Texture2D MyMagneticDiscSpeedText;
+
         // DOCK & STATIONS
 
         public Texture2D BigStationLeft;
@@ -53,22 +62,38 @@ namespace A_BUS_FOR_THE_MOON
         public Texture2D CentralStation;
         public Texture2D CentralStationDockLeft;
         public Texture2D CentralStationDockRight;
-
         public Texture2D SmallStationLeftOrRight;
-        public Texture2D SmallStationDockLeftOrRight;
 
+        public Texture2D SmallStationDockLeftOrRight;
         public Texture2D DockDangerousLeftOrRight;
 
         public List<Assets> DocksAndStations = new List<Assets>();
 
-        public bool DrawStation = false;
-        public bool StationIsDrawn = false;
+        public bool DrawStation1 = false;
+        public bool DrawStation2 = false;
+        public bool DrawStation3 = false;
+        public bool DrawStation4 = false;
+        public bool DrawStation5 = false;
+        public bool DrawStation6 = false;
+        public bool DrawStation7 = false;
+        public bool DrawStation8 = false;
+
+
+        public bool StationIsDrawn1 = false;
+        public bool StationIsDrawn2 = false;
+        public bool StationIsDrawn3 = false;
+        public bool StationIsDrawn4 = false;
+        public bool StationIsDrawn5 = false;
+        public bool StationIsDrawn6 = false;
+        public bool StationIsDrawn7 = false;
+        public bool StationIsDrawn8 = false;
+        public float DockAndStationTimer;
 
         // Bus variables
         public Texture2D MyBus;
         public Texture2D BusExplosion;
 
-        public Vector2 BusPosition ;
+        public Vector2 BusPosition;
         public float BusTargetX;
         public const int BusMinX = 576;
         public const int BusMaxX = 768;
@@ -77,6 +102,10 @@ namespace A_BUS_FOR_THE_MOON
         public bool IsBusExploding = false;
         public bool BusDestroyed = false;
         public Rectangle BusRect;
+        public int BusAlertTimer;
+        public bool BusRed = false;
+        public int BusDestroyedTimer;
+        public bool BusTooSpeed = false;
 
 
         // Affichages
@@ -94,10 +123,11 @@ namespace A_BUS_FOR_THE_MOON
 
         public Texture2D MyMagneticDiscText;
         public Texture2D MyMagneticDiscCollisionText;
-        public List <Assets>MagneticDisc = new List<Assets>();
-        public List <Assets>MagneticDiscUsed = new List<Assets>();
-        public List <Assets>MagneticCollisions = new List<Assets>();
-        public List <Assets>Borders = new List<Assets>();
+        public Texture2D MyMagneticDiscStopText;
+        public List<Assets> MagneticDisc = new List<Assets>();
+        public List<Assets> MagneticDiscUsed = new List<Assets>();
+        public List<Assets> MagneticCollisions = new List<Assets>();
+        public List<Assets> Borders = new List<Assets>();
         public float MagneticDiscCountDown;
         public float NewMagnetDiscCountDown;
         public float MagneticDiscSpeed;
@@ -115,6 +145,8 @@ namespace A_BUS_FOR_THE_MOON
         public bool IsCollidingDisc;
 
         private Font FontInfos = LoadFont("assets/fonts/PixelOperatorSC-Bold.ttf");
+
+        public float DeltaTime = GetFrameTime();
         public Level1()
         {
             Col = 64;
@@ -134,7 +166,7 @@ namespace A_BUS_FOR_THE_MOON
             Assets MyLine1 = new Assets("Line1", MyLines, 509, -720, 0, 0, 1, 0, false, false, false);
             Assets MyLine2 = new Assets("Line2", MyLines, 573, -720, 0, 0, 1, 0, false, false, false);
             Assets MyLine3 = new Assets("Line3", MyLines, 637, -720, 0, 0, 1, 0, false, false, false);
-            Assets MyLine4 = new Assets("Line4", MyLines, 701, - 720, 0, 0, 1, 0, false, false, false);
+            Assets MyLine4 = new Assets("Line4", MyLines, 701, -720, 0, 0, 1, 0, false, false, false);
             Assets MyLine5 = new Assets("Line5", MyLines, 765, -720, 0, 0, 1, 0, false, false, false);
 
             Lines.Add(MyLine1);
@@ -156,13 +188,16 @@ namespace A_BUS_FOR_THE_MOON
             MyBus = LoadTexture("assets/MyBus.png");
             BusExplosion = LoadTexture("assets/BusExplosion.png");
             BusPosition = new Vector2(512, 600);
+            BusAlertTimer = 48;
+            BusDestroyedTimer = 0;
 
             // MagneticDisc variables
             MyMagneticDiscText = LoadTexture("assets/MagneticDisc.png");
             MyMagneticDiscCollisionText = LoadTexture("assets/MagneticDiscColl.png");
             MyMagneticDiscSpeedText = LoadTexture("assets/MagneticDiscSpeedUp.png");
+            MyMagneticDiscStopText = LoadTexture("assets/MagneticDiscStop.png");
 
-            MagneticDiscSpeed = 6;
+            MagneticDiscSpeed = 8;
             MagneticDiscCountDown = 25;
             NewMagnetDiscCountDown = 25;
             BordersSpeed = MagneticDiscSpeed;
@@ -191,18 +226,22 @@ namespace A_BUS_FOR_THE_MOON
 
             DockDangerousLeftOrRight = LoadTexture("assets/DockDangerousLeftOrRight.png");
 
+            DockAndStationTimer = DeltaTime;
+
             //Moon Variables
             MyMoon = LoadTexture("assets/Moon2.png");
-            MoonPosition = new Vector2(-1860,-5200);
-            MoonSpeed = MagneticDiscSpeed / 2;
+            MoonPosition = new Vector2(-1860, -5200);
+            MoonSpeed = MagneticDiscSpeed / 2;         
 
-            DistanceToMoon = 380000;
+            DistanceToMoon = 300000;
+
+            EndTimer = 5;
 
         }
 
         public void Update()
         {
-            float DeltaTime = GetFrameTime();
+            DeltaTime = GetFrameTime();
 
 
             switch (CurrentLevelState)
@@ -222,76 +261,89 @@ namespace A_BUS_FOR_THE_MOON
                     int MyDiscRandom4 = DiscRandom4.Next(1, 100);
                     int MyDiscRandom5 = DiscRandom5.Next(1, 100);
 
-                    if (!BusDestroyed)
-                    {
-                        MagneticDiscCountDown--;
-                        if (MagneticDiscCountDown <= 0)
-                        {
-                            if (MyDiscRandom1 <= 80)
-                            {
-                                Assets MyMagnetic = new Assets("MagneticDisc", MyMagneticDiscText, 480, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
-                                MagneticDisc.Add(MyMagnetic);
-                                MagneticDiscCountDown = NewMagnetDiscCountDown;
-                                DistanceToMoon = DistanceToMoon - 1000;
-                            }
-                            if (MyDiscRandom1 > 80)
-                            {
-                                Assets MagneticDiscSpeed1 = new Assets("MagneticDiscSpeed", MyMagneticDiscSpeedText, 480, -50, 0, MagneticDiscSpeed, 6, 10, false, false, false);
-                                MagneticDisc.Add(MagneticDiscSpeed1);
-                                MagneticDiscCountDown = NewMagnetDiscCountDown;
-                                DistanceToMoon = DistanceToMoon - 1000;
-                            }
-                            if (MyDiscRandom2 <= 80)
-                            {
 
-                                Assets MyMagnetic002 = new Assets("MagneticDisc002", MyMagneticDiscText, 544, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
-                                MagneticDisc.Add(MyMagnetic002);
-                                MagneticDiscCountDown = NewMagnetDiscCountDown;
-                            }
-                            if (MyDiscRandom2 > 80)
-                            {
-                                Assets MagneticDiscSpeed2 = new Assets("MagneticDiscSpeed", MyMagneticDiscSpeedText, 544, -50, 0, MagneticDiscSpeed, 6, 10, false, false, false);
-                                MagneticDisc.Add(MagneticDiscSpeed2);
-                                MagneticDiscCountDown = NewMagnetDiscCountDown;
-                            }
-                            if (MyDiscRandom3 <= 80)
-                            {
-                                Assets MyMagnetic003 = new Assets("MagneticDisc003", MyMagneticDiscText, 608, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
-                                MagneticDisc.Add(MyMagnetic003);
-                                MagneticDiscCountDown = NewMagnetDiscCountDown;
-                            }
-                            if (MyDiscRandom3 > 80)
-                            {
-                                Assets MagneticDiscSpeed3 = new Assets("MagneticDiscSpeed", MyMagneticDiscSpeedText, 608, -50, 0, MagneticDiscSpeed, 6, 10, false, false, false);
-                                MagneticDisc.Add(MagneticDiscSpeed3); ;
-                                MagneticDiscCountDown = NewMagnetDiscCountDown;
-                            }
-                            if (MyDiscRandom4 <= 80)
-                            {
-                                Assets MyMagnetic004 = new Assets("MagneticDisc004", MyMagneticDiscText, 672, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
-                                MagneticDisc.Add(MyMagnetic004);
-                                MagneticDiscCountDown = NewMagnetDiscCountDown;
-                            }
-                            if (MyDiscRandom4 > 80)
-                            {
-                                Assets MagneticDiscSpeed4 = new Assets("MagneticDiscSpeed", MyMagneticDiscSpeedText, 672, -50, 0, MagneticDiscSpeed, 6, 10, false, false, false);
-                                MagneticDisc.Add(MagneticDiscSpeed4);
-                                MagneticDiscCountDown = NewMagnetDiscCountDown;
-                            }
-                            if (MyDiscRandom5 <= 80)
-                            {
-                                Assets MyMagnetic005 = new Assets("MagneticDisc005", MyMagneticDiscText, 736, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
-                                MagneticDisc.Add(MyMagnetic005);
-                                MagneticDiscCountDown = NewMagnetDiscCountDown;
-                            }
-                            if (MyDiscRandom5 > 80)
-                            {
-                                Assets MagneticDiscSpeed5 = new Assets("MagneticDiscSpeed", MyMagneticDiscSpeedText, 736, -50, 0, MagneticDiscSpeed, 6, 10, false, false, false);
-                                MagneticDisc.Add(MagneticDiscSpeed5);
-                                MagneticDiscCountDown = NewMagnetDiscCountDown;
-                            }
+                    MagneticDiscCountDown--;
+                    if (MagneticDiscCountDown <= 0 && DistanceToMoon >= 20000)
+                    {
+                        if (MyDiscRandom1 <= 75)
+                        {
+                            Assets MyMagnetic = new Assets("MagneticDisc", MyMagneticDiscText, 480, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
+                            MagneticDisc.Add(MyMagnetic);
+                            MagneticDiscCountDown = NewMagnetDiscCountDown;
+                            //DistanceToMoon = DistanceToMoon - 1500;
+                        }
+                        if (MyDiscRandom1 > 75)
+                        {
+                            Assets MagneticDiscSpeed1 = new Assets("MagneticDiscSpeed", MyMagneticDiscSpeedText, 480, -50, 0, MagneticDiscSpeed, 6, 10, false, false, false);
+                            MagneticDisc.Add(MagneticDiscSpeed1);
+                            MagneticDiscCountDown = NewMagnetDiscCountDown;
+                            //DistanceToMoon = DistanceToMoon - 1500;
+                        }
+                        if (MyDiscRandom2 <= 75)
+                        {
+
+                            Assets MyMagnetic002 = new Assets("MagneticDisc002", MyMagneticDiscText, 544, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
+                            MagneticDisc.Add(MyMagnetic002);
+                            MagneticDiscCountDown = NewMagnetDiscCountDown;
+                        }
+                        if (MyDiscRandom2 > 75)
+                        {
+                            Assets MagneticDiscSpeed2 = new Assets("MagneticDiscSpeed", MyMagneticDiscSpeedText, 544, -50, 0, MagneticDiscSpeed, 6, 10, false, false, false);
+                            MagneticDisc.Add(MagneticDiscSpeed2);
+                            MagneticDiscCountDown = NewMagnetDiscCountDown;
+                        }
+                        if (MyDiscRandom3 <= 75)
+                        {
+                            Assets MyMagnetic003 = new Assets("MagneticDisc003", MyMagneticDiscText, 608, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
+                            MagneticDisc.Add(MyMagnetic003);
+                            MagneticDiscCountDown = NewMagnetDiscCountDown;
+                        }
+                        if (MyDiscRandom3 > 75)
+                        {
+                            Assets MagneticDiscSpeed3 = new Assets("MagneticDiscSpeed", MyMagneticDiscSpeedText, 608, -50, 0, MagneticDiscSpeed, 6, 10, false, false, false);
+                            MagneticDisc.Add(MagneticDiscSpeed3); ;
+                            MagneticDiscCountDown = NewMagnetDiscCountDown;
+                        }
+                        if (MyDiscRandom4 <= 75)
+                        {
+                            Assets MyMagnetic004 = new Assets("MagneticDisc004", MyMagneticDiscText, 672, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
+                            MagneticDisc.Add(MyMagnetic004);
+                            MagneticDiscCountDown = NewMagnetDiscCountDown;
+                        }
+                        if (MyDiscRandom4 > 75)
+                        {
+                            Assets MagneticDiscSpeed4 = new Assets("MagneticDiscSpeed", MyMagneticDiscSpeedText, 672, -50, 0, MagneticDiscSpeed, 6, 10, false, false, false);
+                            MagneticDisc.Add(MagneticDiscSpeed4);
+                            MagneticDiscCountDown = NewMagnetDiscCountDown;
+                        }
+                        if (MyDiscRandom5 <= 75)
+                        {
+                            Assets MyMagnetic005 = new Assets("MagneticDisc005", MyMagneticDiscText, 736, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
+                            MagneticDisc.Add(MyMagnetic005);
+                            MagneticDiscCountDown = NewMagnetDiscCountDown;
+                        }
+                        if (MyDiscRandom5 > 75)
+                        {
+                            Assets MagneticDiscSpeed5 = new Assets("MagneticDiscSpeed", MyMagneticDiscSpeedText, 736, -50, 0, MagneticDiscSpeed, 6, 10, false, false, false);
+                            MagneticDisc.Add(MagneticDiscSpeed5);
+                            MagneticDiscCountDown = NewMagnetDiscCountDown;
                         }
                     }
+                    if (MagneticDiscCountDown <= 0 && DistanceToMoon < 20000 && DistanceToMoon > 5000)
+                    {
+                        Assets MyMagneticStop1 = new Assets("MagneticDisc", MyMagneticDiscStopText, 480, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
+                        MagneticDisc.Add(MyMagneticStop1);
+                        Assets MyMagneticStop2 = new Assets("MagneticDisc", MyMagneticDiscStopText, 544, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
+                        MagneticDisc.Add(MyMagneticStop2);
+                        Assets MyMagneticStop3 = new Assets("MagneticDisc", MyMagneticDiscStopText, 608, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
+                        MagneticDisc.Add(MyMagneticStop3);
+                        Assets MyMagneticStop4 = new Assets("MagneticDisc", MyMagneticDiscStopText, 672, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
+                        MagneticDisc.Add(MyMagneticStop4);
+                        Assets MyMagneticStop5 = new Assets("MagneticDisc", MyMagneticDiscStopText, 736, -50, 0, MagneticDiscSpeed, 6, 500, false, false, false);
+                        MagneticDisc.Add(MyMagneticStop5);
+                        MagneticDiscCountDown = NewMagnetDiscCountDown;
+                    }
+
 
 
                     foreach (Assets myDisc in MagneticDisc.ToList())
@@ -323,7 +375,7 @@ namespace A_BUS_FOR_THE_MOON
                         myDisc.AssetSourceRec = new Rectangle(myDisc.AssetCurrentFrame * myDisc.AssetFrameWidth, 0, myDisc.AssetFrameWidth, myDisc.AssetFrameHeight);
 
 
-                        /*//Collisions MagneticDisc & Bus                           
+                        //Collisions MagneticDisc & Bus                           
 
                         if (CheckCollisionRecs(myDisc.AssetRect, BusRect))
                         {
@@ -339,7 +391,7 @@ namespace A_BUS_FOR_THE_MOON
                             Assets MyMagneticUsed = new Assets("MagneticDiscUsed", MyMagneticDiscText, (int)myDisc.AssetX, (int)myDisc.AssetY + 45, 0, MagneticDiscSpeed, 6, 10, false, false, false);
                             MagneticDiscUsed.Add(MyMagneticUsed);
                             MagneticDisc.Remove(myDisc);
-                        }*/
+                        }
                     }
 
                     foreach (Assets myDiscColl in MagneticCollisions.ToList())
@@ -373,6 +425,7 @@ namespace A_BUS_FOR_THE_MOON
 
                         if (MyDiscUsed.AssetY > 750)
                         {
+                            DistanceToMoon = DistanceToMoon - 1000;
                             MagneticDiscUsed.Remove(MyDiscUsed);
                         }
 
@@ -401,13 +454,65 @@ namespace A_BUS_FOR_THE_MOON
                     }
 
 
+                    // BusAlert Timer
+                    if (!BusDestroyed && MagneticDiscSpeed >= 8 && MagneticDiscSpeed < 9)
+                    {
+                        BusAlertTimer -= 2;
+
+                        if (BusAlertTimer >= 24)
+                            BusRed = true;
+
+                        if (BusAlertTimer < 24 && BusAlertTimer > 0)
+                            BusRed = false;
+
+                        if (BusAlertTimer <= 0)
+                            BusAlertTimer = 48;
+                    }
+
+                    if (!BusDestroyed && MagneticDiscSpeed >= 9 && MagneticDiscSpeed < 11)
+                    {
+                        BusAlertTimer -= 3;
+
+                        if (BusAlertTimer >= 24)
+                            BusRed = true;
+
+                        if (BusAlertTimer < 24 && BusAlertTimer > 0)
+                            BusRed = false;
+
+                        if (BusAlertTimer <= 0)
+                            BusAlertTimer = 48;
+                    }
+
+                    if (!BusDestroyed && MagneticDiscSpeed >= 11 && MagneticDiscSpeed < 14)
+                    {
+                        BusAlertTimer -= 6;
+
+                        if (BusAlertTimer >= 24)
+                            BusRed = true;
+
+                        if (BusAlertTimer < 24 && BusAlertTimer > 0)
+                            BusRed = false;
+
+                        if (BusAlertTimer <= 0)
+                            BusAlertTimer = 48;
+                    }
+                    if (!BusDestroyed && MagneticDiscSpeed >= 14)
+                    {
+                        IsBusExploding = true;
+                        BusDestroyed = true;
+                        BusTooSpeed = true;
+
+                    }
+
+
+
 
                     // Déplacement des Lines & Borders
 
                     foreach (Assets line in Lines)
                     {
 
-                        line.AssetY += LinesSpeed;
+                        line.AssetY += MagneticDiscSpeed;
                         if (line.AssetY > 0)
                         {
                             line.AssetY = -720;
@@ -416,7 +521,7 @@ namespace A_BUS_FOR_THE_MOON
 
                     foreach (Assets border in Borders)
                     {
-                        border.AssetY += BordersSpeed;
+                        border.AssetY += MagneticDiscSpeed;
                         if (border.AssetY > -1)
                         {
                             border.AssetY = -720;
@@ -425,11 +530,23 @@ namespace A_BUS_FOR_THE_MOON
 
                     // Docks & Stations
 
-                    if (DistanceToMoon == 350000 || DistanceToMoon == 200000 || DistanceToMoon == 150000 || DistanceToMoon == 30000)
-                        DrawStation = true;
-                    StationIsDrawn = true;
+                    if (DistanceToMoon == 350000 && !StationIsDrawn1)
+                        DrawStation1 = true;
 
-                    if (DrawStation)
+                    if (DistanceToMoon == 200000 && !StationIsDrawn2)
+                        DrawStation2 = true;
+
+                    if (DistanceToMoon == 150000 && !StationIsDrawn3)
+                        DrawStation3 = true;
+
+                    if (DistanceToMoon == 30000 && !StationIsDrawn4)
+                        DrawStation4 = true;
+
+
+
+                    //StationIsDrawn = true;
+
+                    if (DrawStation1 || DrawStation2 || DrawStation3 || DrawStation4)
                     {
                         Assets MyCentralStation = new Assets("CentralStation", CentralStation, 544, -500, 0, MagneticDiscSpeed, 1, 1, false, false, false);
                         DocksAndStations.Add(MyCentralStation);
@@ -440,13 +557,41 @@ namespace A_BUS_FOR_THE_MOON
                         Assets MyCentralDockStationRight = new Assets("CentralDockStationRight", CentralStationDockRight, 800, -500, 0, MagneticDiscSpeed, 1, 1, false, false, false);
                         DocksAndStations.Add(MyCentralDockStationRight);
 
-                        DrawStation = false;
+                        if (DrawStation1)
+                        {
+                            DrawStation1 = false;
+                            StationIsDrawn1 = true;
+                        }
+
+
+                        if (DrawStation2)
+                        {
+                            DrawStation2 = false;
+                            StationIsDrawn2 = true;
+                        }
+
+                        if (DrawStation3)
+                        {
+                            DrawStation3 = false;
+                            StationIsDrawn3 = true;
+                        }
+
+                        if (DrawStation4)
+                        {
+                            DrawStation4 = false;
+                            StationIsDrawn4 = true;
+                        }
                     }
 
-                    if (DistanceToMoon == 250000 || DistanceToMoon == 100000)
-                        DrawStation = true;
+                    if (DistanceToMoon == 250000 && !StationIsDrawn5)
+                        DrawStation5 = true;
 
-                    if (DrawStation)
+                    if (DistanceToMoon == 250000 && !StationIsDrawn6)
+                        DrawStation6 = true;
+
+
+
+                    if (DrawStation5 || DrawStation6)
                     {
                         Assets MyBigStationLeft = new Assets("MyBigStationLeft", BigStationLeft, 448, -500, 0, MagneticDiscSpeed, 1, 1, false, false, false);
                         DocksAndStations.Add(MyBigStationLeft);
@@ -454,13 +599,25 @@ namespace A_BUS_FOR_THE_MOON
                         Assets MyBigStationDockRight = new Assets("MyBigStationDockRight", BigStationDockRight, 736, -500, 0, MagneticDiscSpeed, 1, 1, false, false, false);
                         DocksAndStations.Add(MyBigStationDockRight);
 
-                        DrawStation = false;
+                        if (DrawStation5)
+                        {
+                            DrawStation5 = false;
+                            StationIsDrawn5 = true;
+                        }
+                        if (DrawStation6)
+                        {
+                            DrawStation6 = false;
+                            StationIsDrawn6 = true;
+                        }
                     }
 
-                    if (DistanceToMoon == 320000 || DistanceToMoon == 180000)
-                        DrawStation = true;
+                    if (DistanceToMoon == 320000)
+                        DrawStation7 = true;
 
-                    if (DrawStation)
+                    if (DistanceToMoon == 180000)
+                        DrawStation8 = true;
+
+                    if (DrawStation7 || DrawStation8)
                     {
                         Assets MyBigStationRight = new Assets("MyBigStationRight", BigStationRight, 608, -500, 0, MagneticDiscSpeed, 1, 1, false, false, false);
                         DocksAndStations.Add(MyBigStationRight);
@@ -468,7 +625,16 @@ namespace A_BUS_FOR_THE_MOON
                         Assets MyBigStationDockLeft = new Assets("MyBigStationDockLeft", BigStationDockLeft, 448, -500, 0, MagneticDiscSpeed, 1, 1, false, false, false);
                         DocksAndStations.Add(MyBigStationDockLeft);
 
-                        DrawStation = false;
+                        if (DrawStation7)
+                        {
+                            DrawStation7 = false;
+                            StationIsDrawn7 = true;
+                        }
+                        if (DrawStation8)
+                        {
+                            DrawStation8 = false;
+                            StationIsDrawn8 = true;
+                        }
                     }
 
                     foreach (Assets MyDockOrStation in DocksAndStations.ToList())
@@ -479,18 +645,15 @@ namespace A_BUS_FOR_THE_MOON
                             DocksAndStations.Remove(MyDockOrStation);
                         }
 
-                        /*//Collisions
+                        //Collisions
 
-                        Rectangle discRect = new Rectangle(MyDockOrStation.AssetX, MyDockOrStation.AssetY, MyDockOrStation.AssetFrameWidth, MyDockOrStation.AssetFrameHeight);
+                        Rectangle discRect = new Rectangle(MyDockOrStation.AssetX, MyDockOrStation.AssetY, MyDockOrStation.AssetFrameWidth, MyDockOrStation.AssetFrameHeight - 150);
 
-                        (CheckCollisionRecs(MyDockOrStation.AssetRect, BusRect) && !BusDestroyed)
+                        if (CheckCollisionRecs(MyDockOrStation.AssetRect, BusRect) && !BusDestroyed)
                         {
                             IsBusExploding = true;
                             BusDestroyed = true;
-                            /*MagneticDiscSpeed = 0;
-                            BordersSpeed = 0;
-                            LinesSpeed = 0;
-                        }*/
+                        }
                     }
 
                     if (IsBusExploding)
@@ -518,20 +681,91 @@ namespace A_BUS_FOR_THE_MOON
 
                     //THE MOON ARRIVAL
 
-                    if(DistanceToMoon <= 350000)
+                    if (DistanceToMoon <= 20000 && !MoonArrived)
                     {
-                        MoonSpeed = MoonSpeed + (MoonSpeed *DeltaTime) /15;
+                        SpeedEntreeLune = MagneticDiscSpeed;
+                        MoonArrived = true;
+                    }
+
+                    if (DistanceToMoon <= 30000 && DistanceToMoon > 20000)
+                    {
+                        MoonSpeed += ((MagneticDiscSpeed * DeltaTime) * ((30000f - DistanceToMoon) / 30000f)) / 2;
                         MoonPosition.Y += MoonSpeed;
 
                         if (MoonSpeed >= MagneticDiscSpeed)
-                        {
                             MoonSpeed = MagneticDiscSpeed;
-                        }                       
                     }
+
+                    
+
+                    if (DistanceToMoon <= 20000)                   
+                    {
+                        MoonSpeed += ((MagneticDiscSpeed * DeltaTime) * ((30000 - DistanceToMoon) / 30000f)) / 2;
+                        MoonPosition.Y += MoonSpeed;                       
+                        MagneticDiscSpeed = SpeedEntreeLune * (DistanceToMoon / 20000f);
+
+                        if (MoonSpeed >= MagneticDiscSpeed)
+                            MoonSpeed = MagneticDiscSpeed;
+
+                        if (MagneticDiscSpeed <= 1)
+                        {
+                            MagneticDiscSpeed = 0;
+                            DistanceToMoon = 0;
+                            MoonSpeed = 0;
+                            Winner = true;
+                        }
+
+                        if (DistanceToMoon <= 0)
+                            DistanceToMoon = 0;
+                    }
+
+                    if (BusDestroyed)
+                    {
+                        MagneticDiscSpeed -= DeltaTime;
+
+                        if (MagneticDiscSpeed < 6)
+                            Looser = true;
+
+                        if (MagneticDiscSpeed <= 0)
+                            MagneticDiscSpeed = 0;
+                    }
+
+                    if (BusDestroyed && BusTooSpeed)
+                    {
+                        MagneticDiscSpeed -= DeltaTime;
+
+                        if (MagneticDiscSpeed < 6)
+                            Looser = true;
+
+                        if (MagneticDiscSpeed <= 0)
+                            MagneticDiscSpeed = 0;
+                    }
+
+                    if (Looser && MagneticDiscSpeed <= 0)
+                    {
+                        EndTimer -= DeltaTime;
+                        if (EndTimer <= 0)
+                        {
+                            EndTimer = 5;
+                            CurrentLevelState = LevelState.Menu;
+                        }
+
+                    }
+
+                    if (Winner && MagneticDiscSpeed <= 0)
+                    {
+                        EndTimer -= DeltaTime;
+                        if (EndTimer <= 0)
+                        {
+                            EndTimer = 5;
+                            CurrentLevelState = LevelState.Menu;
+                        }
+                    }
+
                     break;
 
-            
-            
+
+
                 case LevelState.Level2:
                     // Handle level 2 logic
                     break;
@@ -569,7 +803,7 @@ namespace A_BUS_FOR_THE_MOON
             {
                 DrawTexture(MyLine.AssetTileSet, (int)MyLine.AssetX, (int)MyLine.AssetY, Color.White);
             }*/
-                    
+
             switch (CurrentLevelState)
             {
                 case LevelState.Menu:
@@ -578,17 +812,21 @@ namespace A_BUS_FOR_THE_MOON
                 case LevelState.Level1:
 
                     DrawTexture(MyMoon, (int)MoonPosition.X, (int)MoonPosition.Y, Color.White);
+                    foreach (Assets MyLine in Lines)
+                    {
+                        DrawTexture(MyLine.AssetTileSet, (int)MyLine.AssetX, (int)MyLine.AssetY, Color.DarkGreen);
+                    }
 
                     foreach (Assets myDisc in MagneticDisc)
                     {
                         //DrawTextureRec(MyMagneticDisc, MagneticDiscAnimationSourceRect, MagneticDiscPosition, Color.White);
                         DrawTexturePro(myDisc.AssetTileSet, myDisc.AssetSourceRec, new Rectangle(myDisc.AssetX, myDisc.AssetY, myDisc.AssetFrameWidth, myDisc.AssetFrameHeight), new Vector2(0, 0), 0, Color.White);
-                        DrawRectangleLinesEx(myDisc.AssetRect, 2, Color.Red);
+                        //DrawRectangleLinesEx(myDisc.AssetRect, 2, Color.Red);
                     }
                     foreach (Assets myDiscColl in MagneticCollisions)
                     {
-                        //DrawTextureRec(MyMagneticDisc, MagneticDiscAnimationSourceRect, MagneticDiscPosition, Color.White);
-                        DrawTexturePro(myDiscColl.AssetTileSet, myDiscColl.AssetSourceRec, new Rectangle(myDiscColl.AssetX, myDiscColl.AssetY, myDiscColl.AssetFrameWidth, myDiscColl.AssetFrameHeight), new Vector2(myDiscColl.AssetFrameWidth / 2, myDiscColl.AssetFrameHeight), 0, Color.White);
+                        if (!BusDestroyed)
+                            DrawTexturePro(myDiscColl.AssetTileSet, myDiscColl.AssetSourceRec, new Rectangle(myDiscColl.AssetX, myDiscColl.AssetY, myDiscColl.AssetFrameWidth, myDiscColl.AssetFrameHeight), new Vector2(myDiscColl.AssetFrameWidth / 2, myDiscColl.AssetFrameHeight), 0, Color.White);
                     }
                     foreach (Assets myDiscUsed in MagneticDiscUsed)
                     {
@@ -596,8 +834,14 @@ namespace A_BUS_FOR_THE_MOON
                         DrawTexturePro(myDiscUsed.AssetTileSet, myDiscUsed.AssetSourceRec, new Rectangle(myDiscUsed.AssetX, myDiscUsed.AssetY, myDiscUsed.AssetFrameWidth, myDiscUsed.AssetFrameHeight), new Vector2(0, myDiscUsed.AssetFrameHeight), 0, Color.White);
                     }
 
-                    if (!BusDestroyed)
+                    if (!BusDestroyed && MagneticDiscSpeed < 10)
                         DrawTexturePro(MyBus, new Rectangle(0, 0, MyBus.Width, MyBus.Height), new Rectangle(BusPosition.X, BusPosition.Y, MyBus.Width, MyBus.Height), new Vector2(MyBus.Width / 2, 0), 0, Color.White);
+
+                    if (!BusDestroyed && BusRed && MagneticDiscSpeed >= 10)
+                        DrawTexturePro(MyBus, new Rectangle(0, 0, MyBus.Width, MyBus.Height), new Rectangle(BusPosition.X, BusPosition.Y, MyBus.Width, MyBus.Height), new Vector2(MyBus.Width / 2, 0), 0, Color.Red);
+                    else if (!BusDestroyed && !BusRed && MagneticDiscSpeed >= 10)
+                        DrawTexturePro(MyBus, new Rectangle(0, 0, MyBus.Width, MyBus.Height), new Rectangle(BusPosition.X, BusPosition.Y, MyBus.Width, MyBus.Height), new Vector2(MyBus.Width / 2, 0), 0, Color.White);
+
 
                     // Borders & Lines
                     /*DrawTexture(MyBorder, 0, 0, Color.White);
@@ -613,7 +857,7 @@ namespace A_BUS_FOR_THE_MOON
                     foreach (Assets MyDockOrStation in DocksAndStations)
                     {
                         DrawTexture(MyDockOrStation.AssetTileSet, (int)MyDockOrStation.AssetX, (int)MyDockOrStation.AssetY, Color.White);
-                        DrawRectangleLinesEx(MyDockOrStation.AssetRect, 2, Color.Red);
+                        //DrawRectangleLinesEx(MyDockOrStation.AssetRect, 2, Color.Red);
                     }
 
                     foreach (Assets explo in BusExplosions)
@@ -621,11 +865,27 @@ namespace A_BUS_FOR_THE_MOON
                         DrawTexturePro(explo.AssetTileSet, explo.AssetSourceRec, new Rectangle(explo.AssetX, explo.AssetY, explo.AssetFrameWidth, explo.AssetFrameHeight), new Vector2(explo.AssetFrameWidth / 2, 30), 0, Color.White);
                     }
 
+                    if (Winner)
+                    {
+                        DrawTextEx(FontInfos, "Winner !", new Vector2(530, 250), FontSize * 2.5f, 0, Color.Red);
+                        DrawTextEx(FontInfos, "You saved all 250 passagers !", new Vector2(470, 350), FontSize, 0, Color.Red);
+
+                    }
+                    if (Looser)
+                    {
+                        DrawTextEx(FontInfos, "Looser !", new Vector2(530, 250), FontSize * 2.5f, 0, Color.Red);
+                        DrawTextEx(FontInfos, "You killed all 250 passagers !", new Vector2(470, 350), FontSize, 0, Color.Red);
+
+                    }
+
 
                     DrawTextEx(FontInfos, "Distance to the Moon", new Vector2(950, 50), FontSize, 0, Color.White);
                     DrawTextEx(FontInfos, "" + DistanceToMoon, new Vector2(1010, 100), FontSize + 10, 0, Color.Green);
+                    //DrawTextEx(FontInfos, "" + MagneticDiscSpeed, new Vector2(1010, 300), FontSize + 10, 0, Color.Green);
+                    //DrawText("" + DistanceToMoon.ToString(), 950, 500, 30, Color.White);
 
-                    DrawRectangleLinesEx(BusRect, 2, Color.White);
+
+                    //DrawRectangleLinesEx(BusRect, 2, Color.White);
                     break;
                 case LevelState.Level2:
                     // Handle level 2 drawing
@@ -655,7 +915,7 @@ namespace A_BUS_FOR_THE_MOON
                     // Handle level 10 drawing
                     break;
             }
-            
+
 
         }
         public void Close()

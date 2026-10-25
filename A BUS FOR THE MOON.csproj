@@ -1,13 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+	  <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>A_BUS_FOR_THE_MOON</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+	<ItemGroup>
+		<Content Include="assets\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="Raylib-cs" Version="8.1.0" />
   </ItemGroup>
